@@ -3,27 +3,28 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/vitaly06/shop-rest-api/internal/infrastructure/config"
+	"github.com/vitaly06/shop-rest-api/internal/infrastructure/database"
 )
 
 func main() {
-	app := fiber.New()
+	cfg := config.Load()
 
-	err := godotenv.Load()
+	db, err := database.NewPostgresDB(cfg)
 
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatal("Database Connection Error: " + err.Error())
 	}
 
-	port := os.Getenv("PORT")
+	database.AutoMigrate(db)
 
-	if port == "" {
-		port = "3000"
-	}
+	app := fiber.New()
+	app.Use(cors.New())
 
-	fmt.Printf("App started on port %s\n", port)
-	app.Listen(":" + port)
+	fmt.Printf("App successfully started on port: %s\n", cfg.Port)
+	app.Listen(":" + cfg.Port)
+
 }
