@@ -1,29 +1,31 @@
 package book
 
 import (
-	"github.com/vitaly06/shop-rest-api/api/presenter"
 	"github.com/vitaly06/shop-rest-api/pkg/entities"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	ReadBook() (*[]presenter.Book, error)
+	ReadBook() (*[]entities.Book, error)
 	CreateBook(book *entities.Book) (*entities.Book, error)
+	GetBook(id int64) (*entities.Book, error)
+	DeleteBook(id int64) error
+	UpdateBook(book *entities.Book) (*entities.Book, error)
 }
 
 type repository struct {
-	DB *gorm.DB
+	db *gorm.DB
 }
 
 func NewRepo(db *gorm.DB) Repository {
 	return &repository{
-		DB: db,
+		db: db,
 	}
 }
 
-func (r *repository) ReadBook() (*[]presenter.Book, error) {
-	var books []presenter.Book
-	if err := r.DB.Find(&books).Error; err != nil {
+func (r *repository) ReadBook() (*[]entities.Book, error) {
+	var books []entities.Book
+	if err := r.db.Find(&books).Error; err != nil {
 		return nil, err
 	}
 
@@ -31,7 +33,35 @@ func (r *repository) ReadBook() (*[]presenter.Book, error) {
 }
 
 func (r *repository) CreateBook(book *entities.Book) (*entities.Book, error) {
-	if err := r.DB.Create(&book).Error; err != nil {
+	if err := r.db.Create(&book).Error; err != nil {
+		return nil, err
+	}
+
+	return book, nil
+}
+
+func (r *repository) GetBook(id int64) (*entities.Book, error) {
+	var book entities.Book
+
+	if err := r.db.Where("id = ?", id).First(&book).Error; err != nil {
+		return nil, err
+	}
+
+	return &book, nil
+}
+
+func (r *repository) DeleteBook(id int64) error {
+	var book entities.Book
+
+	if err := r.db.Delete(&book, id).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *repository) UpdateBook(book *entities.Book) (*entities.Book, error) {
+	if err := r.db.Save(&book).Error; err != nil {
 		return nil, err
 	}
 

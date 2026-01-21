@@ -19,10 +19,19 @@ func BookErrorResponse(err error) *fiber.Map {
 	}
 }
 
-func BooksSuccessResponse(books *[]Book) *fiber.Map {
+func BooksSuccessResponse(books *[]entities.Book) *fiber.Map {
+	var formattedBooks []Book
+	for _, book := range *books {
+		formattedBooks = append(formattedBooks, Book{
+			ID:     book.ID,
+			Title:  book.Title,
+			Author: book.Author,
+		})
+	}
+
 	return &fiber.Map{
 		"status": true,
-		"data":   books,
+		"data":   formattedBooks,
 		"error":  nil,
 	}
 }

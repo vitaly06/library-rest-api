@@ -9,4 +9,7 @@ import (
 func BookRouter(app *fiber.App, service book.Service) {
 	app.Get("/books", handlers.GetBooks(service))
 	app.Post("/books", handlers.InsertBook(service))
+	app.Get("/books/:id", handlers.GetBook(service))
+	app.Delete("/books/:id", handlers.DeleteBook(service))
+	app.Put("/books/:id", handlers.UpdateBook(service))
 }
