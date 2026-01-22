@@ -10,6 +10,14 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Get books
+// @Description Find all books
+// @Accept json
+// @Produce json
+// @Tags books
+// @Success 200 {object} presenter.BooksResponse
+// @Failure 500 {object} presenter.ErrorResponse
+// @Router /books [get]
 func GetBooks(service book.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		fetched, err := service.FetchBooks()
@@ -23,9 +31,18 @@ func GetBooks(service book.Service) fiber.Handler {
 	}
 }
 
+// @Summary Insert book
+// @Accept json
+// @Produce json
+// @Tags books
+// @Param data body presenter.CreateBookRequest true "Book data"
+// @Success 201 {object} presenter.BookResponse
+// @Failure 400 {object} presenter.ErrorResponse
+// @Failure 500 {object} presenter.ErrorResponse
+// @Router /books [post]
 func InsertBook(service book.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var requestBody entities.Book
+		var requestBody presenter.CreateBookRequest
 		err := c.BodyParser(&requestBody)
 
 		if err != nil {
@@ -35,7 +52,12 @@ func InsertBook(service book.Service) fiber.Handler {
 			return c.Status(400).JSON(presenter.BookErrorResponse(errors.New("Please specify title and author")))
 		}
 
-		result, err := service.InsertBook(&requestBody)
+		book := &entities.Book{
+			Title:  requestBody.Title,
+			Author: requestBody.Author,
+		}
+
+		result, err := service.InsertBook(book)
 
 		if err != nil {
 			return c.Status(500).JSON(presenter.BookErrorResponse(err))
@@ -45,6 +67,17 @@ func InsertBook(service book.Service) fiber.Handler {
 	}
 }
 
+// @Summary Get book
+// @Description Find book by ID
+// @Param id path int true "book ID"
+// @Accept json
+// @Produce json
+// @Tags books
+// @Success 200 {object} presenter.BookResponse
+// @Failure 500 {object} presenter.ErrorResponse
+// @Failure 400 {object} presenter.ErrorResponse
+// @Failure 404 {object} presenter.ErrorResponse
+// @Router /books/{id} [get]
 func GetBook(service book.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		bookId, err := c.ParamsInt("id")
@@ -67,6 +100,17 @@ func GetBook(service book.Service) fiber.Handler {
 	}
 }
 
+// @Summary Delete book
+// @Description Delete book by ID
+// @Param id path int true "book ID"
+// @Accept json
+// @Produce json
+// @Tags books
+// @Success 200 {object} presenter.DeleteResponse
+// @Failure 400 {object} presenter.ErrorResponse
+// @Failure 404 {object} presenter.ErrorResponse
+// @Failure 500 {object} presenter.ErrorResponse
+// @Router /books/{id} [delete]
 func DeleteBook(service book.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		bookId, err := c.ParamsInt("id")
@@ -87,15 +131,23 @@ func DeleteBook(service book.Service) fiber.Handler {
 			return c.Status(500).JSON(presenter.BookErrorResponse(err))
 		}
 
-		return c.Status(200).JSON(fiber.Map{
-			"success": true,
-			"data":    "",
-			"error":   nil,
-		})
+		return c.Status(200).JSON(presenter.BookDeleteResponse())
 
 	}
 }
 
+// @Summary Update book
+// @Description Update book by ID
+// @Param id path int true "book ID"
+// @Param data body presenter.UpdateBookRequest true "Book data"
+// @Accept json
+// @Produce json
+// @Tags books
+// @Success 200 {object} presenter.BookResponse
+// @Failure 400 {object} presenter.ErrorResponse
+// @Failure 404 {object} presenter.ErrorResponse
+// @Failure 500 {object} presenter.ErrorResponse
+// @Router /books/{id} [put]
 func UpdateBook(service book.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		bookId, err := c.ParamsInt("id")
@@ -114,16 +166,20 @@ func UpdateBook(service book.Service) fiber.Handler {
 			return c.Status(500).JSON(presenter.BookErrorResponse(err))
 		}
 
-		var requestBody entities.Book
+		var requestBody presenter.UpdateBookRequest
 		err = c.BodyParser(&requestBody)
 
 		if err != nil {
 			return c.Status(400).JSON(presenter.BookErrorResponse(err))
 		}
 
-		requestBody.ID = uint(bookId)
+		book := &entities.Book{
+			ID:     uint(bookId),
+			Title:  requestBody.Title,
+			Author: requestBody.Author,
+		}
 
-		result, err := service.UpdateBook(&requestBody)
+		result, err := service.UpdateBook(book)
 
 		if err != nil {
 			return c.Status(500).JSON(presenter.BookErrorResponse(err))

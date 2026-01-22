@@ -4,6 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
 	"github.com/joho/godotenv"
 )
 
@@ -31,6 +33,10 @@ func Load() *Config {
 		DBPassword: getEnv("DB_PASSWORD", ""),
 		DBPort:     getEnv("DB_PORT", "5432"),
 	}
+}
+
+func LoadSwaggerConfig(app *fiber.App) {
+	app.Get("/docs/", swagger.HandlerDefault)
 }
 
 func getEnv(key string, defaultValue string) string {

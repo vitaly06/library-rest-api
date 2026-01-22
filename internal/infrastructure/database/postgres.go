@@ -25,7 +25,7 @@ func NewPostgresDB(cfg *config.Config) (*gorm.DB, error) {
 }
 
 func AutoMigrate(connection *gorm.DB) {
-	connection.Debug().AutoMigrate(
+	connection.AutoMigrate(
 		&entities.User{},
 		&entities.Book{},
 	)

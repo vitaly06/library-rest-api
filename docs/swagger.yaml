@@ -1,0 +1,219 @@
+basePath: /
+definitions:
+  presenter.Book:
+    properties:
+      author:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  presenter.BookResponse:
+    properties:
+      data:
+        $ref: '#/definitions/presenter.Book'
+      error: {}
+      status:
+        type: boolean
+    type: object
+  presenter.BooksResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/presenter.Book'
+        type: array
+      error: {}
+      status:
+        type: boolean
+    type: object
+  presenter.CreateBookRequest:
+    properties:
+      author:
+        type: string
+      title:
+        type: string
+    type: object
+  presenter.DeleteResponse:
+    properties:
+      data:
+        type: string
+      error: {}
+      status:
+        type: boolean
+    type: object
+  presenter.ErrorResponse:
+    properties:
+      data:
+        type: string
+      error:
+        type: string
+      status:
+        type: boolean
+    type: object
+  presenter.UpdateBookRequest:
+    properties:
+      author:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: This is library Rest Api for Fiber
+  termsOfService: http://swagger.io/terms/
+  title: Shop REST API
+  version: "1.0"
+paths:
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Find all books
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.BooksResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+      summary: Get books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Book data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/presenter.CreateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/presenter.BookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+      summary: Insert book
+      tags:
+      - books
+  /books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete book by ID
+      parameters:
+      - description: book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.DeleteResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+      summary: Delete book
+      tags:
+      - books
+    get:
+      consumes:
+      - application/json
+      description: Find book by ID
+      parameters:
+      - description: book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.BookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+      summary: Get book
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      description: Update book by ID
+      parameters:
+      - description: book ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Book data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/presenter.UpdateBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/presenter.BookResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/presenter.ErrorResponse'
+      summary: Update book
+      tags:
+      - books
+swagger: "2.0"

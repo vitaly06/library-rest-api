@@ -6,9 +6,47 @@ import (
 )
 
 type Book struct {
-	ID     uint   `json:"id" gorm:"primaryKey"`
+	ID     uint   `json:"id"`
 	Title  string `json:"title"`
 	Author string `json:"author"`
+}
+
+type CreateBookRequest struct {
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+
+type UpdateBookRequest struct {
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+
+// Swagger error response
+type ErrorResponse struct {
+	Data   string `json:"data"`
+	Status bool   `json:"status"`
+	Error  string `json:"error"`
+}
+
+// Swagger book response
+type BookResponse struct {
+	Data   Book `json:"data"`
+	Status bool `json:"status"`
+	Error  any  `json:"error"`
+}
+
+// Swagger books response
+type BooksResponse struct {
+	Data   []Book `json:"data"`
+	Status bool   `json:"status"`
+	Error  any    `json:"error"`
+}
+
+// Swagger book delete response
+type DeleteResponse struct {
+	Status bool   `json:"status"`
+	Data   string `json:"data"`
+	Error  any    `json:"error"`
 }
 
 func BookErrorResponse(err error) *fiber.Map {
@@ -46,6 +84,14 @@ func BookSuccessResponse(data *entities.Book) *fiber.Map {
 	return &fiber.Map{
 		"status": true,
 		"data":   book,
+		"error":  nil,
+	}
+}
+
+func BookDeleteResponse() *fiber.Map {
+	return &fiber.Map{
+		"status": true,
+		"data":   "",
 		"error":  nil,
 	}
 }
